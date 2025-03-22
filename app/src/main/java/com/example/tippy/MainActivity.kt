@@ -4,7 +4,6 @@ import android.animation.ArgbEvaluator
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.widget.EditText
 import android.widget.SeekBar
 import android.widget.TextView
@@ -14,9 +13,14 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.tippy.databinding.ActivityMainBinding
+import java.text.NumberFormat
+import java.util.Currency
+import java.util.Locale
 
 private const val TAG: String = "MainActivity"
 private const val INITIAL_TIP_PERCENT: Int = 0
+private val utils = Utils()
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var seekBarTip: SeekBar
@@ -33,14 +37,12 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         enableEdgeToEdge()
-//        setContentView(R.layout.activity_main)
         setContentView(binding.root)
         init()
         initVars()
         seekBarTip.progress = INITIAL_TIP_PERCENT
-        lblTipPercent.text = "$INITIAL_TIP_PERCENT%"
+        lblTipPercent.text = utils.percentString(INITIAL_TIP_PERCENT)
         updateTipStatus(INITIAL_TIP_PERCENT)
-
         seekBarTipAction()
         txtBaseAction()
 
@@ -60,6 +62,7 @@ class MainActivity : AppCompatActivity() {
 
         })
 
+
     }
 
     private fun computeTipAndTotalAmount() {
@@ -70,14 +73,10 @@ class MainActivity : AppCompatActivity() {
         }
         val baseAmount: Double = txtBase.text.toString().toDouble()
         val tipPercent = seekBarTip.progress
-        val tipAmount = calcPercentage(baseAmount, tipPercent)
+        val tipAmount = utils.calcPercentage(baseAmount, tipPercent)
         val totalAmount = baseAmount + tipAmount
-
-
-        lblTipAmount.text = to2dp(tipAmount)
-        lblTotal.text = to2dp(totalAmount)
-
-
+        lblTipAmount.text = utils.formatCurrency(tipAmount)
+        lblTotal.text = utils.formatCurrency(totalAmount)
 
     }
 
@@ -85,8 +84,7 @@ class MainActivity : AppCompatActivity() {
     private fun seekBarTipAction() {
         seekBarTip.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(seekBar: SeekBar?, progress: Int, fromUser: Boolean) {
-                Log.i(TAG, "onProgressChanged $progress")
-                lblTipPercent.text = "$progress%"
+                lblTipPercent.text = utils.percentString(progress)
                 computeTipAndTotalAmount()
                 updateTipStatus(progress)
             }
@@ -132,7 +130,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun init() {
-
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())

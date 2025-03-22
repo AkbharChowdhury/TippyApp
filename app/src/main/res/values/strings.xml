@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">Tippy</string>
+<!--    <string name="format_percent">%d\ %</string>-->
+<!--    <string name="format_percent">%2$d</string>-->
+
 
 </resources>
